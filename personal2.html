@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nikitha's Store — Personal Cloud Storage with AI Optimization</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #6366f1;
+      --secondary: #8b5cf6;
+      --accent: #06b6d4;
+    }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI,
+        Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .grad {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+    .shadow-smooth {
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,.25);
+    }
+    .kbd {
+      border: 1px solid #e5e7eb;
+      border-bottom-width: 3px;
+      border-radius: .5rem;
+      padding: .125rem .375rem;
+      font-size: .75rem;
+      background: #fff;
+    }
+    /* Drag highlight */
+    .drop-highlight { outline: 3px dashed rgba(99,102,241,.6); outline-offset: 6px; }
+
+    /* ------ Starter Sticker ------ */
+    .sticker {
+      position: fixed; top: 76px; left: 14px; z-index: 60;
+      transform: rotate(-6deg);
+      transition: transform .25s ease, opacity .2s ease;
+      user-select: none; cursor: grab;
+    }
+    .sticker.dragging { cursor: grabbing; }
+    .sticker:hover { transform: rotate(-3deg) scale(1.02); }
+    .sticker .pin {
+      position: absolute; width: 14px; height: 14px; border-radius: 9999px;
+      background: #0ea5e9; top: -7px; left: 50%; transform: translateX(-50%);
+      box-shadow: 0 8px 12px -6px rgba(0,0,0,.35); border: 2px solid #fff;
+    }
+  </style>
+</head>
+
+<body class="text-gray-900 selection:bg-indigo-200">
+  <!-- Starter Sticker (draggable) -->
+  <div id="starterSticker" class="sticker">
+    <div class="relative">
+      <div class="pin" aria-hidden="true"></div>
+      <div class="rounded-2xl bg-white shadow-smooth border border-indigo-200 px-4 py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl grad grid place-items-center text-white">
+            <span class="font-bold">NS</span>
+          </div>
+          <div>
+            <div class="font-bold text-indigo-700">Nikitha’s Store</div>
+            <div class="text-xs text-gray-500 -mt-0.5">AI-Optimized Cloud</div>
+          </div>
+          <button id="closeSticker" class="ml-1 text-gray-400 hover:text-gray-700" title="Hide">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Nav -->
+  <header class="glass fixed inset-x-0 top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <a href="#top" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl grad grid place-items-center text-white">
+            <i class="fa-solid fa-cloud"></i>
+          </div>
+          <div class="text-white">
+            <div class="font-bold text-xl">Nikitha's Store</div>
+            <div class="text-xs opacity-80">AI-Optimized Cloud</div>
+          </div>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-6 text-white/90">
+          <a href="#dashboard" class="hover:text-white">Dashboard</a>
+          <a href="#upload" class="hover:text-white">Upload</a>
+          <a href="#optimizer" class="hover:text-white">Optimizer</a>
+          <a href="#files" class="hover:text-white">Files</a>
+          <a href="#analytics" class="hover:text-white">Analytics</a>
+          <a href="#settings" class="hover:text-white">Settings</a>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <button id="btnOpenPicker"
+            class="hidden sm:inline-flex items-center px-4 py-2 rounded-lg text-white grad shadow-smooth hover:opacity-95">
+            <i class="fa-solid fa-plus mr-2"></i> Upload
+          </button>
+          <button id="btnMobileMenu" class="md:hidden text-white text-2xl">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+      <div id="mobileMenu" class="md:hidden hidden pb-4">
+        <nav class="grid gap-2 text-white/90">
+          <a class="hover:text-white" href="#dashboard">Dashboard</a>
+          <a class="hover:text-white" href="#upload">Upload</a>
+          <a class="hover:text-white" href="#optimizer">Optimizer</a>
+          <a class="hover:text-white" href="#files">Files</a>
+          <a class="hover:text-white" href="#analytics">Analytics</a>
+          <a class="hover:text-white" href="#settings">Settings</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="pt-24 pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Hero -->
+      <section class="glass rounded-3xl p-6 sm:p-8 text-white mb-8">
+        <div class="grid md:grid-cols-2 gap-6 items-center">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-white/15 px-3 py-1 rounded-full text-xs mb-3">
+              <i class="fa-solid fa-sparkles"></i>
+              <span>Now with persistence, export/import & draggable sticker</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold leading-tight">
+              Your personal cloud, <span class="underline decoration-white/50">supercharged by AI</span>
+            </h1>
+            <p class="mt-3 text-white/90">
+              Automatic compression, duplicate detection, smart categorization, and
+              live analytics – all in your browser for a fast, safe demo.
+            </p>
+            <div class="mt-5 flex flex-wrap gap-3">
+              <a href="#upload" class="inline-flex items-center px-5 py-3 rounded-xl bg-white text-indigo-700 font-semibold shadow-smooth">
+                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Add Files
+              </a>
+              <a href="#optimizer" class="inline-flex items-center px-5 py-3 rounded-xl border border-white/30 text-white font-semibold hover:bg-white/10">
+                <i class="fa-solid fa-bolt mr-2"></i> Run Optimizer
+              </a>
+            </div>
+          </div>
+          <!-- Updated dashboard preview image (smaller size) -->
+          <div class="rounded-2xl overflow-hidden bg-white/10 flex justify-center px-3 py-2">
+            <img
+              src="https://t3.ftcdn.net/jpg/10/31/33/72/360_F_1031337229_3hijhKnzIEGwVESrQN2OQQ5MI5HPPJvv.jpg"
+              alt="Dashboard preview illustration showing cloud storage concept with abstract shapes"
+              class="h-44 sm:h-56 w-auto object-cover rounded-lg"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="dashboard" class="grid md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white rounded-2xl p-6 shadow-smooth">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">Storage Usage</h3>
+            <span id="usageLabel" class="text-sm text-gray-500">0% used</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3">
+            <div id="usageBar" class="h-2.5 rounded-full" style="width:0%; background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <span id="usageNumbers">0 MB of 20 GB</span>
+            <span id="freeNumbers">20 GB free</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 shadow-smooth">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">AI Optimizations</h3>
+            <span id="savedLabel" class="text-sm text-green-600">+0 MB saved</span>
+          </div>
+          <div class="text-4xl font-extrabold text-indigo-600 mb-1" id="efficiencyPercent">100%</div>
+          <p class="text-sm text-gray-600">Efficiency after compression & de-dup</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 shadow-smooth">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">Files</h3>
+            <span id="fileCount" class="text-sm text-blue-600">0 files</span>
+          </div>
+          <div class="grid grid-cols-3 text-center gap-4">
+            <div>
+              <div id="countImages" class="text-2xl font-bold text-blue-600">0</div>
+              <div class="text-xs text-gray-500">Images</div>
+            </div>
+            <div>
+              <div id="countDocs" class="text-2xl font-bold text-emerald-600">0</div>
+              <div class="text-xs text-gray-500">Documents</div>
+            </div>
+            <div>
+              <div id="countOther" class="text-2xl font-bold text-orange-600">0</div>
+              <div class="text-xs text-gray-500">Other</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Upload -->
+      <section id="upload" class="bg-white rounded-2xl p-6 shadow-smooth mb-10">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Upload Files</h2>
+          <div class="text-sm text-gray-500">Tip: Press <span class="kbd">U</span> to open file picker</div>
+        </div>
+
+        <div id="dropZone" class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center transition-all">
+          <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-4"></i>
+          <p class="text-gray-600 mb-3">Drag & drop files here, or click to browse</p>
+          <button id="btnSelect" class="inline-flex items-center grad text-white px-5 py-3 rounded-lg font-semibold">
+            <i class="fa-solid fa-plus mr-2"></i>Select Files
+          </button>
+          <input id="fileInput" type="file" multiple class="hidden" />
+        </div>
+
+        <div id="uploadList" class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- Optimizer with polished feature logos -->
+      <section id="optimizer" class="rounded-2xl p-6 grad text-white shadow-smooth mb-10">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">AI Storage Optimizer</h2>
+          <button id="btnOptimize" class="bg-white text-indigo-700 px-4 py-2 rounded-lg font-semibold">
+            <i class="fa-solid fa-bolt mr-2"></i>Run Optimization
+          </button>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-4">
+          <!-- Smart Compression -->
+          <article class="bg-white/10 p-4 rounded-xl">
+            <header class="flex items-center mb-3 gap-3">
+              <div class="w-12 h-12 rounded-full bg-white/20 grid place-items-center">
+                <!-- Logo -->
+                <svg role="img" aria-label="Smart Compression logo" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="4" width="18" height="16" rx="3" stroke="white" stroke-width="1.5"/>
+                  <path d="M8 8h8M10 12h6M6 12h2M8 16h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold">Smart Compression</h3>
+            </header>
+            <figure class="text-sm text-white/90">
+              <img src="https://placehold.co/320x120/png?text=Compression+Preview" class="w-full h-20 object-cover rounded-lg mb-2" alt="Preview image representing smart compression reducing file sizes"/>
+              <figcaption>Lossless-first compression simulation with type-aware ratios.</figcaption>
+            </figure>
+          </article>
+
+          <!-- Duplicate Detection -->
+          <article class="bg-white/10 p-4 rounded-xl">
+            <header class="flex items-center mb-3 gap-3">
+              <div class="w-12 h-12 rounded-full bg-white/20 grid place-items-center">
+                <!-- Logo -->
+                <svg role="img" aria-label="Duplicate Detection logo" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="white" stroke-width="1.5"/>
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="white" stroke-width="1.5" opacity=".9"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold">Duplicate Detection</h3>
+            </header>
+            <figure class="text-sm text-white/90">
+              <img src="https://placehold.co/320x120/png?text=Duplicates+Highlighted" class="w-full h-20 object-cover rounded-lg mb-2" alt="Preview image representing duplicate files highlighted for removal"/>
+              <figcaption>Secure hashing (SHA-256) to find exact duplicates.</figcaption>
+            </figure>
+          </article>
+
+          <!-- Smart Categorization -->
+          <article class="bg-white/10 p-4 rounded-xl">
+            <header class="flex items-center mb-3 gap-3">
+              <div class="w-12 h-12 rounded-full bg-white/20 grid place-items-center">
+                <!-- Logo -->
+                <svg role="img" aria-label="Smart Categorization logo" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 7h6l1.5 2H20v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="white" stroke-width="1.5"/>
+                  <path d="M6 12h6M6 15h9" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold">Smart Categorization</h3>
+            </header>
+            <figure class="text-sm text-white/90">
+              <img src="https://placehold.co/320x120/png?text=Auto+Folders" class="w-full h-20 object-cover rounded-lg mb-2" alt="Preview image representing files automatically sorted into folders"/>
+              <figcaption>Auto-buckets: Images, Docs, Video, Audio, Archives, Other.</figcaption>
+            </figure>
+          </article>
+
+          <!-- Usage Predictions -->
+          <article class="bg-white/10 p-4 rounded-xl">
+            <header class="flex items-center mb-3 gap-3">
+              <div class="w-12 h-12 rounded-full bg-white/20 grid place-items-center">
+                <!-- Logo -->
+                <svg role="img" aria-label="Usage Predictions logo" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 19h16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M6 15l3-3 3 2 4-6 2 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold">Usage Predictions</h3>
+            </header>
+            <figure class="text-sm text-white/90">
+              <img src="https://placehold.co/320x120/png?text=Forecast+Trend" class="w-full h-20 object-cover rounded-lg mb-2" alt="Preview image showing a trend line forecast for storage usage"/>
+              <figcaption>Simple trend projection for the next 30 days.</figcaption>
+            </figure>
+          </article>
+        </div>
+
+        <div id="optStatus" class="mt-5 text-sm text-white/90 hidden"></div>
+      </section>
+
+      <!-- Files / Management -->
+      <section id="files" class="bg-white rounded-2xl p-6 shadow-smooth mb-10">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 class="text-2xl font-bold">File Management</h2>
+          <div class="flex flex-wrap gap-2">
+            <input id="searchInput" placeholder="Search files…" class="px-3 py-2 rounded-lg border" />
+            <select id="filterCategory" class="px-3 py-2 rounded-lg border">
+              <option value="">All categories</option>
+              <option>Images</option><option>Documents</option><option>Video</option>
+              <option>Audio</option><option>Archives</option><option>Other</option>
+            </select>
+            <select id="sortBy" class="px-3 py-2 rounded-lg border">
+              <option value="name">Sort: Name</option>
+              <option value="size">Sort: Size</option>
+              <option value="date">Sort: Date</option>
+              <option value="status">Sort: Status</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="text-left text-gray-500 border-b">
+                <th class="py-3 pr-4">Name</th>
+                <th class="py-3 pr-4">Type</th>
+                <th class="py-3 pr-4">Category</th>
+                <th class="py-3 pr-4">Size</th>
+                <th class="py-3 pr-4">Status</th>
+                <th class="py-3 pr-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fileTableBody"></tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-500 mt-3">Note: Demo can now persist files in your browser via IndexedDB.</p>
+      </section>
+
+      <!-- Analytics -->
+      <section id="analytics" class="grid lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl p-6 shadow-smooth">
+          <h3 class="text-xl font-bold mb-4">Storage Distribution</h3>
+          <canvas id="chartDistribution" height="220" aria-label="Pie chart of storage by category"></canvas>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-smooth">
+          <h3 class="text-xl font-bold mb-4">Optimization Results</h3>
+          <canvas id="chartBeforeAfter" height="220" aria-label="Bar chart comparing original vs effective size"></canvas>
+          <img class="mt-4 rounded-lg" src="https://placehold.co/600x150/png?text=Optimization+summary" alt="Banner titled Optimization summary with abstract chart shapes" />
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-smooth lg:col-span-2">
+          <h3 class="text-xl font-bold mb-4">Projected Usage (30 days)</h3>
+          <canvas id="chartProjection" height="220" aria-label="Line chart showing projected storage usage"></canvas>
+        </div>
+      </section>
+
+      <!-- Settings & Data -->
+      <section id="settings" class="bg-white rounded-2xl p-6 shadow-smooth mt-10">
+        <h2 class="text-2xl font-bold mb-4">Settings</h2>
+        <div class="grid lg:grid-cols-3 gap-6">
+          <!-- Compression -->
+          <div class="border rounded-xl p-4">
+            <h4 class="font-semibold mb-2">Compression</h4>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="optLossless" class="rounded" checked />
+              <span>Prefer lossless for documents & archives</span>
+            </label>
+            <label class="flex items-center gap-2 mt-2">
+              <input type="range" id="optCompressionLevel" min="1" max="5" value="3" />
+              <span class="text-sm text-gray-600">Aggressiveness</span>
+            </label>
+            <p class="text-xs text-gray-500 mt-2">Higher aggressiveness yields more savings for media (simulated).</p>
+          </div>
+
+          <!-- Duplicate Detection -->
+          <div class="border rounded-xl p-4">
+            <h4 class="font-semibold mb-2">Duplicate Detection</h4>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="optExactHash" class="rounded" checked />
+              <span>Exact match via SHA-256</span>
+            </label>
+            <label class="flex items-center gap-2 mt-2">
+              <input type="checkbox" id="optLooseName" class="rounded" />
+              <span>Loose filename similarity (experimental)</span>
+            </label>
+            <p class="text-xs text-gray-500 mt-2">Loose mode flags files with very similar names (e.g. <em>image(1).jpg</em> vs <em>image.jpg</em>).</p>
+          </div>
+
+          <!-- Data & Persistence -->
+          <div class="border rounded-xl p-4">
+            <h4 class="font-semibold mb-2">Data & Persistence</h4>
+            <p class="text-sm text-gray-600">Status: <span id="persistStatus" class="font-medium text-gray-900">Checking…</span></p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button id="btnExport" class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100"><i class="fa-solid fa-file-export mr-1"></i> Export Dataset</button>
+              <button id="btnImport" class="px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-file-import mr-1"></i> Import Dataset</button>
+              <input id="importInput" type="file" accept="application/json" class="hidden" />
+              <button id="btnClearAll" class="px-3 py-2 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100"><i class="fa-solid fa-trash mr-1"></i> Clear All</button>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button id="btnStickerReset" class="px-3 py-2 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-thumbtack mr-1"></i> Reset Sticker</button>
+            </div>
+            <p class="text-xs text-gray-500 mt-3">Export creates a single JSON with file contents embedded (base64). Large datasets can be big.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="bg-gray-950 text-white/90 py-8 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-lg font-bold mb-2">Nikitha's Store</h3>
+          <p class="text-sm text-gray-300">Intelligent personal cloud with on-device demo AI features.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Features</h4>
+          <ul class="space-y-1 text-gray-300 text-sm">
+            <li>AI Compression</li><li>Smart Categorization</li><li>Duplicate Detection</li><li>Analytics</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Resources</h4>
+          <ul class="space-y-1 text-gray-300 text-sm">
+            <li>Docs</li><li>API</li><li>Pricing</li><li>Support</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Connect</h4>
+          <div class="flex gap-3 text-xl">
+            <i class="fa-brands fa-x-twitter hover:text-white cursor-pointer"></i>
+            <i class="fa-brands fa-github hover:text-white cursor-pointer"></i>
+            <i class="fa-brands fa-linkedin hover:text-white cursor-pointer"></i>
+            <i class="fa-brands fa-discord hover:text-white cursor-pointer"></i>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-white/10 mt-8 pt-6 text-center text-sm text-gray-400">
+        © <span id="year"></span> Nikitha's Store. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======= App Logic ======= -->
+  <script>
+    // -------------------- State --------------------
+    const QUOTA_BYTES = 20 * 1024 * 1024 * 1024; // 20 GB
+    let files = []; // {id, file, blob, name, type, sizeOrig, sizeEff, category, date, hash, optimized, duplicateOf, looseKey}
+    let totalOriginal = 0;
+    let totalEffective = 0;
+    let totalSaved = 0;
+
+    // Persistence (IndexedDB)
+    const DB_NAME = 'nikitha-store';
+    const DB_VER = 1;
+    const STORE = 'files';
+    let db = null;
+
+    // Sticker state (localStorage)
+    const STICKER_KEY = 'nikitha.sticker';
+
+    // -------------------- Utils --------------------
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+    const fmtBytes = (bytes) => {
+      const units = ["B","KB","MB","GB","TB"];
+      if (bytes === 0) return "0 B";
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return (bytes / Math.pow(1024, i)).toFixed(i ? 1 : 0) + " " + units[i];
+    };
+
+    const getCategory = (type, name="") => {
+      if (!type) return "Other";
+      if (type.startsWith("image/")) return "Images";
+      if (type.startsWith("video/")) return "Video";
+      if (type.startsWith("audio/")) return "Audio";
+      if (["application/pdf",
+           "application/msword",
+           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+           "application/vnd.ms-excel",
+           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+           "text/plain",
+           "application/vnd.ms-powerpoint",
+           "application/vnd.openxmlformats-officedocument.presentationml.presentation"].includes(type)) return "Documents";
+      if (type.includes("zip") || type.includes("x-7z-compressed") || type.includes("x-rar-compressed") || name.endsWith(".rar")) return "Archives";
+      return "Other";
+    };
+
+    const looseNameKey = (n) =>
+      n.toLowerCase()
+       .replace(/\.[^.]+$/, "")
+       .replace(/[\s_\-()]+/g, "")
+       .replace(/\d+$/,"");
+
+    const sha256 = async (file) => {
+      const buf = await file.arrayBuffer();
+      const hash = await crypto.subtle.digest("SHA-256", buf);
+      return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,"0")).join("");
+    };
+
+    // Heuristic compression ratio by type & aggressiveness (1..5)
+    const compressionRatio = (cat, aggressiveness, preferLossless) => {
+      const base = {
+        Images: 0.28,
+        Video: 0.18,
+        Audio: 0.12,
+        Documents: 0.10,
+        Archives: 0.02,
+        Other: 0.05
+      }[cat] ?? 0.05;
+
+      let factor = 1 + (aggressiveness - 3) * 0.08; // +/-16% swing
+      if (preferLossless && (cat === "Documents" || cat === "Archives")) factor = Math.min(factor, 1);
+      return Math.max(0, Math.min(0.85, base * factor));
+    };
+
+    // -------------------- DOM Elements --------------------
+    const usageBar = $("#usageBar");
+    const usageLabel = $("#usageLabel");
+    const usageNumbers = $("#usageNumbers");
+    const freeNumbers = $("#freeNumbers");
+    const savedLabel = $("#savedLabel");
+    const efficiencyPercent = $("#efficiencyPercent");
+    const fileCountEl = $("#fileCount");
+    const cImages = $("#countImages"), cDocs = $("#countDocs"), cOther = $("#countOther");
+
+    const dropZone = $("#dropZone");
+    const fileInput = $("#fileInput");
+    const btnSelect = $("#btnSelect");
+    const btnOpenPicker = $("#btnOpenPicker");
+    const uploadList = $("#uploadList");
+
+    const fileTableBody = $("#fileTableBody");
+    const searchInput = $("#searchInput");
+    const filterCategory = $("#filterCategory");
+    const sortBy = $("#sortBy");
+
+    const btnOptimize = $("#btnOptimize");
+    const optStatus = $("#optStatus");
+    const optLossless = $("#optLossless");
+    const optCompressionLevel = $("#optCompressionLevel");
+    const optExactHash = $("#optExactHash");
+    const optLooseName = $("#optLooseName");
+
+    const btnMobileMenu = $("#btnMobileMenu");
+    const mobileMenu = $("#mobileMenu");
+
+    const closeSticker = $("#closeSticker");
+    const starterSticker = $("#starterSticker");
+
+    const persistStatus = $("#persistStatus");
+    const btnExport = $("#btnExport");
+    const btnImport = $("#btnImport");
+    const importInput = $("#importInput");
+    const btnClearAll = $("#btnClearAll");
+    const btnStickerReset = $("#btnStickerReset");
+
+    // Charts
+    let chartDistribution, chartBeforeAfter, chartProjection;
+
+    // -------------------- Event Wiring --------------------
+    btnMobileMenu.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+    btnSelect.addEventListener("click", () => fileInput.click());
+    btnOpenPicker?.addEventListener("click", () => fileInput.click());
+    document.addEventListener("keydown", (e) => { if (e.key.toLowerCase() === "u") fileInput.click(); });
+
+    // Sticker dismiss
+    closeSticker.addEventListener("click", () => { saveStickerState({ visible: false }); starterSticker.remove(); });
+
+    // Sticker drag
+    (() => {
+      let dragging = false, startX = 0, startY = 0, startLeft = 14, startTop = 76;
+      const onPointerDown = (e) => {
+        if (e.target.id === 'closeSticker' || e.target.closest('#closeSticker')) return; // don't start drag on close
+        dragging = true; starterSticker.classList.add('dragging');
+        startX = e.clientX; startY = e.clientY;
+        const rect = starterSticker.getBoundingClientRect();
+        startLeft = rect.left; startTop = rect.top;
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp, { once: true });
+      };
+      const onPointerMove = (e) => {
+        if (!dragging) return;
+        const left = Math.max(6, Math.min(window.innerWidth - 160, startLeft + (e.clientX - startX)));
+        const top = Math.max(60, Math.min(window.innerHeight - 100, startTop + (e.clientY - startY)));
+        starterSticker.style.left = left + 'px';
+        starterSticker.style.top = top + 'px';
+      };
+      const onPointerUp = () => {
+        dragging = false; starterSticker.classList.remove('dragging');
+        saveStickerState({ visible: true, left: parseInt(starterSticker.style.left||'14'), top: parseInt(starterSticker.style.top||'76') });
+        window.removeEventListener('pointermove', onPointerMove);
+      };
+      starterSticker.addEventListener('pointerdown', onPointerDown);
+    })();
+
+    // Drag & drop
+    ["dragenter","dragover"].forEach(evt => dropZone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation(); dropZone.classList.add("drop-highlight");
+    }));
+    ["dragleave","drop"].forEach(evt => dropZone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation(); dropZone.classList.remove("drop-highlight");
+    }));
+    dropZone.addEventListener("drop", (e) => { const list = [...(e.dataTransfer?.files || [])]; if (list.length) handleFiles(list); });
+    dropZone.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => handleFiles([...e.target.files]));
+
+    // Filters / sort
+    [searchInput, filterCategory, sortBy].forEach(el => el.addEventListener("input", renderTable));
+
+    // Optimizer
+    btnOptimize.addEventListener("click", runOptimization);
+
+    // Footer year
+    $("#year").textContent = new Date().getFullYear();
+
+    // Data & Persistence actions
+    btnExport.addEventListener('click', exportDataset);
+    btnImport.addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', importDatasetFromFile);
+    btnClearAll.addEventListener('click', async () => { if (!confirm('Clear all files from this demo?')) return; await clearDB(); files = []; recompute(); renderTable(); updateCharts(); });
+    btnStickerReset.addEventListener('click', () => { saveStickerState({ visible: true, left: 14, top: 76 }); applyStickerState(); });
+
+    // -------------------- Files Flow --------------------
+    async function handleFiles(selected) {
+      for (const f of selected) {
+        const id = crypto.randomUUID();
+        const hash = await sha256(f); // exact duplicate check
+
+        // Check if duplicate by hash
+        let duplicateOf = null;
+        const dup = files.find(x => x.hash === hash);
+        if (dup) duplicateOf = dup.id;
+
+        const category = getCategory(f.type, f.name);
+        const obj = {
+          id, file: f, blob: f, // keep the blob; File is a Blob
+          name: f.name,
+          type: f.type || "application/octet-stream",
+          sizeOrig: f.size,
+          sizeEff: f.size, // before optimization
+          category,
+          date: f.lastModified || Date.now(),
+          hash,
+          optimized: false,
+          duplicateOf,
+          looseKey: looseNameKey(f.name)
+        };
+        files.push(obj);
+        await dbPut(obj);
+
+        // Loose filename duplicate (optional)
+        if (optLooseName.checked && !duplicateOf) {
+          const near = files.find(x => x.id !== id && x.looseKey === obj.looseKey && x.type === obj.type);
+          if (near) { obj.duplicateOf = near.id; await dbPut(obj); }
+        }
+
+        // Show upload tile
+        addUploadTile(obj);
+      }
+      recompute();
+      renderTable();
+      updateCharts();
+    }
+
+    function addUploadTile(item) {
+      const el = document.createElement("div");
+      el.className = "bg-gray-50 rounded-xl p-4 border border-gray-200";
+      el.innerHTML = `
+        <div class="flex items-center mb-3">
+          <div class="w-12 h-12 ${iconBg(item.category)} rounded-lg grid place-items-center mr-3">
+            ${iconFor(item.category)}
+          </div>
+          <div class="min-w-0">
+            <h4 class="font-semibold truncate" title="${item.name}">${item.name}</h4>
+            <p class="text-xs text-gray-500">${fmtBytes(item.sizeOrig)} • ${item.type || "Unknown"}</p>
+          </div>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm ${item.duplicateOf ? "text-orange-600" : "text-emerald-600"}">
+            ${item.duplicateOf ? "Possible duplicate" : "Ready"}
+          </span>
+          <span class="text-xs text-gray-500">${new Date(item.date).toLocaleString()}</span>
+        </div>`;
+      uploadList.prepend(el);
+    }
+
+    // -------------------- Recompute / Dashboard --------------------
+    function recompute() {
+      totalOriginal = files.reduce((a,f) => a + f.sizeOrig, 0);
+      // Effective size counts only one copy for duplicates
+      const kept = new Set();
+      totalEffective = files.reduce((a,f) => {
+        if (f.duplicateOf) {
+          return kept.has(f.duplicateOf) ? a : a + f.sizeEff;
+        } else {
+          kept.add(f.id);
+          return a + f.sizeEff;
+        }
+      }, 0);
+
+      totalSaved = Math.max(0, totalOriginal - totalEffective);
+      const usedPct = Math.min(100, (totalEffective / QUOTA_BYTES) * 100) || 0;
+
+      usageBar.style.width = usedPct.toFixed(1) + "%";
+      usageLabel.textContent = `${usedPct.toFixed(1)}% used`;
+      usageNumbers.textContent = `${fmtBytes(totalEffective)} of ${fmtBytes(QUOTA_BYTES)}`;
+      freeNumbers.textContent = `${fmtBytes(Math.max(0, QUOTA_BYTES - totalEffective))} free`;
+      savedLabel.textContent = `+${fmtBytes(totalSaved)} saved`;
+      efficiencyPercent.textContent = totalOriginal ? Math.max(1, (totalEffective / totalOriginal) * 100).toFixed(0) + "%" : "100%";
+
+      // Counts
+      const counts = { Images:0, Documents:0, Video:0, Audio:0, Archives:0, Other:0 };
+      files.forEach(f => counts[f.category]++);
+      cImages.textContent = counts.Images;
+      cDocs.textContent = counts.Documents;
+      cOther.textContent = counts.Video + counts.Audio + counts.Archives + counts.Other;
+      fileCountEl.textContent = `${files.length} file${files.length===1?"":"s"}`;
+    }
+
+    // -------------------- Optimizer --------------------
+    async function runOptimization() {
+      if (!files.length) { toast("No files to optimize. Upload some first."); return; }
+      btnOptimize.disabled = true;
+      btnOptimize.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Optimizing…';
+      optStatus.classList.remove("hidden");
+      optStatus.textContent = "Analyzing content types, computing hashes, and simulating compression…";
+
+      await sleep(500);
+
+      const preferLossless = optLossless.checked;
+      const aggr = +optCompressionLevel.value;
+      const exact = optExactHash.checked;
+
+      // Refresh duplicates (if toggles changed)
+      if (exact) {
+        const seen = new Map();
+        for (const f of files) {
+          f.duplicateOf = null;
+          if (seen.has(f.hash)) f.duplicateOf = seen.get(f.hash);
+          else seen.set(f.hash, f.id);
+        }
+      }
+      if (optLooseName.checked) {
+        const byKey = new Map();
+        for (const f of files) {
+          if (!byKey.has(f.looseKey)) byKey.set(f.looseKey, f.id);
+          else if (!f.duplicateOf) f.duplicateOf = byKey.get(f.looseKey);
+        }
+      }
+
+      // "Compress" and de-dup
+      for (const f of files) {
+        const ratio = compressionRatio(f.category, aggr, preferLossless);
+        const compressed = Math.round(f.sizeOrig * (1 - ratio));
+        if (f.duplicateOf) { f.sizeEff = 0; f.optimized = true; }
+        else { f.sizeEff = Math.min(f.sizeOrig, compressed); f.optimized = true; }
+        await dbPut(f);
+      }
+
+      recompute();
+      renderTable();
+      updateCharts();
+
+      btnOptimize.disabled = false;
+      btnOptimize.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Optimized!';
+      setTimeout(() => { btnOptimize.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i>Run Optimization'; }, 1500);
+      optStatus.textContent = `Optimization complete. Total saved ${fmtBytes(totalSaved)} (${((totalSaved / (totalOriginal || 1))*100).toFixed(1)}%).`;
+      toast("AI optimization completed!");
+    }
+
+    // -------------------- Table Render --------------------
+    function renderTable() {
+      const q = searchInput.value.trim().toLowerCase();
+      const cat = filterCategory.value;
+      const sort = sortBy.value;
+
+      let list = files.slice();
+      if (q) list = list.filter(f => f.name.toLowerCase().includes(q));
+      if (cat) list = list.filter(f => f.category === cat);
+
+      list.sort((a,b) => {
+        if (sort === "name") return a.name.localeCompare(b.name);
+        if (sort === "size") return (b.sizeEff || b.sizeOrig) - (a.sizeEff || a.sizeOrig);
+        if (sort === "date") return b.date - a.date;
+        if (sort === "status") return (Number(!!b.duplicateOf) + Number(!b.optimized)) - (Number(!!a.duplicateOf) + Number(!a.optimized));
+        return 0;
+      });
+
+      fileTableBody.innerHTML = "";
+      for (const f of list) {
+        const tr = document.createElement("tr");
+        tr.className = "border-b last:border-0";
+        tr.innerHTML = `
+          <td class="py-3 pr-4">
+            <div class="flex items-center gap-3 max-w-[360px]">
+              <div class="w-9 h-9 ${iconBg(f.category)} rounded-md grid place-items-center">
+                ${iconFor(f.category, true)}
+              </div>
+              <div class="min-w-0">
+                <div class="truncate font-medium" title="${f.name}">${f.name}</div>
+                <div class="text-[11px] text-gray-500">${new Date(f.date).toLocaleString()}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 pr-4 text-gray-600">${f.type || "—"}</td>
+          <td class="py-3 pr-4">${badge(f.category)}</td>
+          <td class="py-3 pr-4">${fmtBytes(f.sizeEff ?? f.sizeOrig)} <span class="text-xs text-gray-400">(orig ${fmtBytes(f.sizeOrig)})</span></td>
+          <td class="py-3 pr-4">
+            ${f.duplicateOf ? '<span class="px-2 py-1 text-xs rounded bg-orange-100 text-orange-700">Duplicate</span>' : ''}
+            ${f.optimized ? '<span class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700">Optimized</span>' : '<span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">Pending</span>'}
+          </td>
+          <td class="py-3 pr-4">
+            <div class="flex gap-2">
+              <button class="px-3 py-1 rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100" data-action="opt" data-id="${f.id}" title="Optimize this file">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </button>
+              <button class="px-3 py-1 rounded bg-red-50 text-red-700 hover:bg-red-100" data-action="del" data-id="${f.id}" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>`;
+        fileTableBody.appendChild(tr);
+      }
+
+      // actions
+      fileTableBody.querySelectorAll("button[data-action]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id");
+          const action = btn.getAttribute("data-action");
+          const item = files.find(x => x.id === id);
+          if (!item) return;
+
+          if (action === "del") {
+            files = files.filter(x => x.id !== id);
+            await dbDel(id);
+            recompute(); renderTable(); updateCharts();
+          }
+          if (action === "opt") {
+            const ratio = compressionRatio(item.category, +optCompressionLevel.value, optLossless.checked);
+            item.sizeEff = Math.round(item.sizeOrig * (1 - ratio));
+            item.optimized = true;
+            await dbPut(item);
+            recompute(); renderTable(); updateCharts();
+            toast(`Optimized "${item.name}"`);
+          }
+        });
+      });
+    }
+
+    // -------------------- Charts --------------------
+    function updateCharts() {
+      const cats = ["Images","Documents","Video","Audio","Archives","Other"];
+      const byCatBytes = {Images:0, Documents:0, Video:0, Audio:0, Archives:0, Other:0};
+      const seen = new Set();
+      for (const f of files) {
+        if (f.duplicateOf) {
+          if (!seen.has(f.duplicateOf)) { byCatBytes[f.category] += f.sizeEff; seen.add(f.duplicateOf); }
+        } else { byCatBytes[f.category] += f.sizeEff; }
+      }
+      const distData = cats.map(c => byCatBytes[c]);
+
+      const before = files.reduce((a,f)=>a+f.sizeOrig,0);
+      const after = files.reduce((a,f)=>a + (f.duplicateOf ? 0 : (f.sizeEff ?? f.sizeOrig)),0);
+
+      // Distribution Pie
+      if (!chartDistribution) {
+        chartDistribution = new Chart($("#chartDistribution"), {
+          type: "pie",
+          data: { labels: cats, datasets: [{ data: distData }] },
+          options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+        });
+      } else {
+        chartDistribution.data.datasets[0].data = distData; chartDistribution.update();
+      }
+
+      // Before / After Bar
+      if (!chartBeforeAfter) {
+        chartBeforeAfter = new Chart($("#chartBeforeAfter"), {
+          type: "bar",
+          data: { labels: ["Original", "Effective"], datasets: [{ data: [before, after] }] },
+          options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: (v) => fmtBytes(v) } } } }
+        });
+      } else {
+        chartBeforeAfter.data.datasets[0].data = [before, after]; chartBeforeAfter.update();
+      }
+
+      // Projection: naive linear over 30 days
+      const today = new Date();
+      const labels = Array.from({length: 30}, (_,i) => { const d = new Date(today); d.setDate(d.getDate()+i); return `${d.getMonth()+1}/${d.getDate()}`; });
+      const dailyDelta = Math.max(0, (after / 30) * 0.02); // +2% per day (demo)
+      const proj = labels.map((_,i) => Math.min(QUOTA_BYTES, after + dailyDelta * i));
+
+      if (!chartProjection) {
+        chartProjection = new Chart($("#chartProjection"), {
+          type: "line",
+          data: { labels, datasets: [{ data: proj, tension: .3 }] },
+          options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: (v) => fmtBytes(v) } } } }
+        });
+      } else {
+        chartProjection.data.labels = labels; chartProjection.data.datasets[0].data = proj; chartProjection.update();
+      }
+    }
+
+    // -------------------- Persistence (IndexedDB) --------------------
+    function dbOpen() {
+      return new Promise((resolve, reject) => {
+        if (!('indexedDB' in window)) { return reject(new Error('IndexedDB not supported')); }
+        const req = indexedDB.open(DB_NAME, DB_VER);
+        req.onupgradeneeded = (e) => {
+          const dbi = req.result;
+          if (!dbi.objectStoreNames.contains(STORE)) {
+            dbi.createObjectStore(STORE, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbTx(mode) {
+      const tx = db.transaction(STORE, mode);
+      return tx.objectStore(STORE);
+    }
+
+    function dbPut(obj) {
+      return new Promise((resolve, reject) => {
+        try {
+          const store = dbTx('readwrite');
+          const toSave = { ...obj };
+          // Ensure we only store serializable pieces (File is fine; it's a Blob)
+          store.put(toSave).onsuccess = () => resolve();
+        } catch (e) { console.error(e); reject(e); }
+      });
+    }
+
+    function dbDel(id) {
+      return new Promise((resolve, reject) => {
+        try { dbTx('readwrite').delete(id).onsuccess = () => resolve(); }
+        catch (e) { reject(e); }
+      });
+    }
+
+    function dbClear() {
+      return new Promise((resolve, reject) => {
+        try { dbTx('readwrite').clear().onsuccess = () => resolve(); }
+        catch (e) { reject(e); }
+      });
+    }
+
+    function dbAll() {
+      return new Promise((resolve, reject) => {
+        const res = [];
+        try {
+          const store = dbTx('readonly');
+          const req = store.openCursor();
+          req.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) { res.push(cursor.value); cursor.continue(); }
+            else resolve(res);
+          };
+          req.onerror = () => reject(req.error);
+        } catch (e) { reject(e); }
+      });
+    }
+
+    async function clearDB() { await dbClear(); }
+
+    async function loadFromDB() {
+      try {
+        const list = await dbAll();
+        files = list.map(r => {
+          // Ensure we have a File object for hashing/export if needed
+          let blob = r.blob || r.file; // some browsers may store as 'file'
+          if (!(blob instanceof Blob)) {
+            // In case of structured clone differences, skip creating File
+          }
+          let fileObj = blob ? new File([blob], r.name, { type: r.type, lastModified: r.date || Date.now() }) : null;
+          return { ...r, blob: blob || null, file: fileObj };
+        });
+      } catch (e) {
+        console.warn('Failed to load from DB', e);
+      }
+      recompute(); renderTable(); updateCharts();
+    }
+
+    // -------------------- Export / Import --------------------
+    function blobToDataURL(blob) {
+      return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onerror = () => reject(fr.error);
+        fr.onload = () => resolve(fr.result);
+        fr.readAsDataURL(blob);
+      });
+    }
+
+    function dataURLToBlob(dataURL) {
+      const [meta, b64] = dataURL.split(',');
+      const mime = (meta.match(/data:(.*?);base64/)||[])[1] || 'application/octet-stream';
+      const bin = atob(b64);
+      const len = bin.length; const arr = new Uint8Array(len);
+      for (let i=0;i<len;i++) arr[i] = bin.charCodeAt(i);
+      return new Blob([arr], { type: mime });
+    }
+
+    async function exportDataset() {
+      if (!files.length) { toast('No data to export'); return; }
+      const items = [];
+      for (const f of files) {
+        const blob = f.blob || f.file || null;
+        let dataURL = null;
+        if (blob) { try { dataURL = await blobToDataURL(blob); } catch { /* ignore */ } }
+        items.push({
+          id: f.id, name: f.name, type: f.type, sizeOrig: f.sizeOrig, sizeEff: f.sizeEff,
+          category: f.category, date: f.date, hash: f.hash, optimized: f.optimized,
+          duplicateOf: f.duplicateOf || null, looseKey: f.looseKey, dataURL
+        });
+      }
+      const payload = { version: 1, createdAt: Date.now(), items };
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `nikitha-store-export-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      toast('Export started');
+    }
+
+    async function importDatasetFromFile(e) {
+      const file = e.target.files?.[0]; if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!data || !Array.isArray(data.items)) throw new Error('Invalid dataset');
+        for (const it of data.items) {
+          let blob = null, fileObj = null;
+          if (it.dataURL) {
+            blob = dataURLToBlob(it.dataURL);
+            fileObj = new File([blob], it.name, { type: it.type, lastModified: it.date || Date.now() });
+          }
+          const id = files.some(x=>x.id===it.id) ? crypto.randomUUID() : (it.id || crypto.randomUUID());
+          // Recompute hash if new content available; else keep old hash
+          let hash = it.hash;
+          if (fileObj) { try { hash = await sha256(fileObj); } catch {} }
+          const obj = {
+            id, file: fileObj, blob: blob,
+            name: it.name, type: it.type || 'application/octet-stream',
+            sizeOrig: it.sizeOrig || (blob?.size || 0),
+            sizeEff: it.sizeEff ?? (blob?.size || 0),
+            category: it.category || getCategory(it.type || '', it.name || ''),
+            date: it.date || Date.now(),
+            hash: hash || '', optimized: !!it.optimized,
+            duplicateOf: it.duplicateOf || null,
+            looseKey: it.looseKey || looseNameKey(it.name || '')
+          };
+          files.push(obj);
+          await dbPut(obj);
+        }
+        recompute(); renderTable(); updateCharts();
+        toast('Import complete');
+      } catch (err) {
+        console.error(err); alert('Failed to import dataset. Ensure it\'s a valid Nikitha\'s Store export JSON.');
+      } finally {
+        importInput.value = '';
+      }
+    }
+
+    // -------------------- Helpers --------------------
+    function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+    function toast(msg) {
+      const t = document.createElement("div");
+      t.className = "fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-smooth z-[60]";
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(()=>{ t.remove(); }, 1800);
+    }
+
+    function iconFor(category, small=false) {
+      const base = small ? "text-sm" : "text-lg";
+      const map = { Images: "fa-image", Documents: "fa-file-lines", Video: "fa-film", Audio: "fa-music", Archives: "fa-file-zipper", Other: "fa-file" };
+      return `<i class="fa-solid ${map[category] || map.Other} ${base}"></i>`;
+    }
+    function iconBg(category) {
+      return ({ Images: "bg-blue-100 text-blue-600", Documents: "bg-emerald-100 text-emerald-600", Video: "bg-purple-100 text-purple-600", Audio: "bg-pink-100 text-pink-600", Archives: "bg-amber-100 text-amber-600", Other: "bg-gray-100 text-gray-600", })[category] || "bg-gray-100 text-gray-600";
+    }
+    function badge(text) {
+      const cls = { Images: "bg-blue-50 text-blue-700", Documents: "bg-emerald-50 text-emerald-700", Video: "bg-purple-50 text-purple-700", Audio: "bg-pink-50 text-pink-700", Archives: "bg-amber-50 text-amber-700", Other: "bg-gray-50 text-gray-700", }[text] || "bg-gray-50 text-gray-700";
+      return `<span class="px-2 py-1 rounded text-xs ${cls}">${text}</span>`;
+    }
+
+    // -------------------- Init --------------------
+    (async function init() {
+      // Sticker state load
+      applyStickerState();
+
+      // Open DB
+      try {
+        db = await dbOpen();
+        persistStatus.textContent = 'On (IndexedDB)';
+        await loadFromDB();
+      } catch (e) {
+        console.warn('DB unavailable', e);
+        persistStatus.textContent = 'Off (unsupported)';
+      }
+
+      recompute(); renderTable(); updateCharts();
+    })();
+
+    function saveStickerState(partial) {
+      const current = JSON.parse(localStorage.getItem(STICKER_KEY) || '{}');
+      const next = { visible: true, left: 14, top: 76, ...current, ...partial };
+      localStorage.setItem(STICKER_KEY, JSON.stringify(next));
+    }
+    function applyStickerState() {
+      const s = JSON.parse(localStorage.getItem(STICKER_KEY) || '{}');
+      if (s.visible === false) { try { starterSticker.remove(); } catch {} return; }
+      if (typeof s.left === 'number') starterSticker.style.left = s.left + 'px';
+      if (typeof s.top === 'number') starterSticker.style.top = s.top + 'px';
+    }
+  </script>
+</body>
+</html>
