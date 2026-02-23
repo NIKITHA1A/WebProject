@@ -1,18 +1,16 @@
-# 📝 Full-Stack Todo Application (Spring Boot + React)
+#Full-Stack Todo Application (Spring Boot + React)
 
 A full-stack Todo application built with:
 
-- ⚙️ Spring Boot (REST API)
-- ⚛️ React (Hooks + Axios)
-- 🗄 PostgreSQL / H2
-- 🔐 JWT Authentication (optional advanced setup)
-- 🐳 Docker support
+-  Spring Boot (REST API)
+-  React (Hooks + Axios)
+-  PostgreSQL / H2
+-  JWT Authentication (optional advanced setup)
+-  Docker support
 
 This project demonstrates clean architecture, REST conventions, validation, authentication, and modern frontend practices.
 
----
-
-## 📦 Tech Stack
+##  Tech Stack
 
 ### Backend
 - Spring Boot 3
@@ -31,9 +29,7 @@ This project demonstrates clean architecture, REST conventions, validation, auth
 - Docker
 - Docker Compose
 
----
-
-## 🚀 Features
+##  Features
 
 ### Backend
 - Create Todo
@@ -53,7 +49,5 @@ This project demonstrates clean architecture, REST conventions, validation, auth
 - Delete Todo
 - Clean minimal UI
 - Axios API integration
-
----
 
 ## 🗂 Project Structure
