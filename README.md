@@ -50,4 +50,4 @@ This project demonstrates clean architecture, REST conventions, validation, auth
 - Clean minimal UI
 - Axios API integration
 
-## 🗂 Project Structure
+## Project Structure
