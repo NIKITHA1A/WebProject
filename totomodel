@@ -1,19 +1,4 @@
-todo-fullstack-app/
-│
-├── backend/
-│   ├── src/main/java/com/example/todo
-│   │    ├── config/
-│   │    ├── controller/
-│   │    ├── service/
-│   │    ├── repository/
-│   │    ├── model/
-│   │    ├── security/
-│   │    └── TodoApplication.java
-│   ├── src/main/resources/
-│   │    └── application.yml
-│   ├── Dockerfile
-│   └── pom.xml
-│
+
 ├── frontend/
 │   ├── src/
 │   │    ├── components/
